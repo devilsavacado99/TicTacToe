@@ -1,0 +1,45 @@
+version: '3.4'  #Compose file version - not necessary anymore
+
+services:
+  tic-tac-toe-game-service_1:                       
+    image: tic-tac-toe-base-image:v1
+    environment:
+      - USER=${NODE_ENV}
+    container_name: tic_tac_toe_game_container_with_volume
+    build:            
+      context: .                #Either a path to a directory containing a Dockerfile, or a url to a git repository.
+      dockerfile: Dockerfile.tictactoe
+      target: dev
+    working_dir: /tic_tac_toe_app
+    volumes:
+      - ./app:/tic_tac_toe_app/app:rw
+    stdin_open: true # docker run -i    #Can receive input from the user
+    tty: true # docker run -t           #pseudo-terminal (TTY)
+    command: ["python3", "-m", "app.main"]                  #docker compose --profile dev up --build
+    profiles: ["dev"]  #to make services optional "in the same compose file" - docker compose --profile dev run --rm tic-tac-toe-game-service_1
+  tic-tac-toe-test-service_2:
+    image: tic-tac-toe-base-image:v1
+    container_name: tic_tac_toe_game_tests
+    build:
+      context: .
+      dockerfile: Dockerfile.tictactoe
+      target: dev
+    working_dir: /tic_tac_toe_app
+    volumes:
+      - ./app:/tic_tac_toe_app/app:rw
+      - ./tests:/tic_tac_toe_app/tests:rw
+    command: ["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"]
+    profiles: ["dev"]  #to make services optional "in the same compose file" - docker compose --profile dev run --rm tic-tac-toe-test-service_2
+ 
+  tic-tac-toe-prod-service_3:
+    image: tic-tac-toe-base-image:v1
+    container_name: tic_tac_toe_game_prod
+    build:
+      context: .
+      dockerfile: Dockerfile.tictactoe
+      target: prod
+    working_dir: /tic_tac_toe_app
+    stdin_open: true # docker run -i    #Can receive input from the user
+    tty: true # docker run -t           #pseudo-terminal (TTY)
+    command: ["python3", "-m", "app.main"]   
+    profiles: ["prod"]  #to make services optional "in the same compose file" - docker compose --profile prod run --rm tic-tac-toe-prod-service_3

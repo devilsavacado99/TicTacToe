@@ -1,0 +1,31 @@
+FROM ubuntu:22.04 AS base
+
+WORKDIR /tic_tac_toe_app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    python3.10-dev \
+    python3-pip \
+    autotools-dev \
+    build-essential \
+    libssl-dev \
+    openssh-server \
+    nano \
+    wget 
+
+RUN ln -s /usr/bin/python3 /usr/bin/python && \
+    rm /usr/bin/pip && \
+    ln -s /usr/bin/pip3 /usr/bin/pip && \
+    pip install -U pip
+
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+FROM base AS dev 
+CMD ["python3","-m", "app.main"]
+
+FROM base as prod
+COPY app ./app
+COPY tests ./tests
+CMD ["python3","-m", "app.main"]
