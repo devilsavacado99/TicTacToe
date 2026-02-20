@@ -59,3 +59,5 @@ This project uses only Python’s standard library.
 - Python 3.11.2 or later
 
 No external dependencies are required.
+# TicTacToe
+This project is a command-line implementation of the classic Tic Tac Toe game written in Python.
